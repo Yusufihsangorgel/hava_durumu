@@ -25,35 +25,22 @@ class _SearchPageState extends State<SearchPage> {
         backgroundColor: Colors.transparent,
         body: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                "20° C",
-                style: TextStyle(
-                  fontSize: 70,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Text(
-                      "Ankara",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: "Şehir Seçiniz",
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.search,
-                      size: 30,
-                    ),
-                  )
-                ],
-              )
+                  style: TextStyle(
+                    fontSize: 30,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ],
           ),
         ),
