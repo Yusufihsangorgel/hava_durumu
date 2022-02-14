@@ -7,7 +7,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -15,21 +17,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int? temp;
-  var sehir;
+
+  String sehir = 'London';
   var locationData;
   var woeid;
   var weather_state_name;
-  var weather_state_abbr;
+  var arkaPlan = 'c';
 
   Future<void> getLocationData() async {
     locationData = await http
-        .get("https://www.metaweather.com/api/location/search/?query=london");
+        .get("https://www.metaweather.com/api/location/search/?query=$sehir");
     var locationDataParsed = jsonDecode(locationData.body);
     woeid = locationDataParsed[0]['woeid'];
     print('woeid = $woeid');
     sehir = locationDataParsed[0]['title'];
     weather_state_name = locationDataParsed[0]['weather_state_name'];
-    weather_state_abbr = locationDataParsed[0]['weather_state_abbr'];
   }
 
   Future<void> getLocationTemperature() async {
@@ -40,6 +42,9 @@ class _HomePageState extends State<HomePage> {
       temp =
           temperatureDataParsed['consolidated_weather'][0]['the_temp'].round();
       print('Sıcaklık = $temp');
+      arkaPlan = temperatureDataParsed['consolidated_weather'][0]
+          ["weather_state_abbr"];
+      print('hava kısaltması : ' + arkaPlan);
     });
   }
 
@@ -59,7 +64,7 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         image: DecorationImage(
           fit: BoxFit.cover,
-          image: AssetImage("images/c.jpg"),
+          image: AssetImage("images/$arkaPlan.jpg"),
         ),
       ),
       child: temp == null
@@ -73,29 +78,61 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       temp.toString() + "° C",
                       style: TextStyle(
-                        fontSize: 70,
-                        fontWeight: FontWeight.w600,
-                      ),
+                          fontSize: 70,
+                          fontWeight: FontWeight.w600,
+                          shadows: <Shadow>[
+                            Shadow(
+                                color: Colors.black38,
+                                blurRadius: 5,
+                                offset: Offset(-3, 3))
+                          ]),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 20),
-                          child: Text(
-                            sehir.toString(),
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20),
-                          ),
+                          child: sehir == 'Ä°zmir'
+                              ? Text(
+                                  'İzmir',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      shadows: <Shadow>[
+                                        Shadow(
+                                            color: Colors.black38,
+                                            blurRadius: 5,
+                                            offset: Offset(-3, 3))
+                                      ]),
+                                )
+                              : Text(
+                                  sehir.toString(),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      shadows: <Shadow>[
+                                        Shadow(
+                                            color: Colors.black38,
+                                            blurRadius: 5,
+                                            offset: Offset(-3, 3))
+                                      ]),
+                                ),
                         ),
                         IconButton(
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            sehir = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SearchPage(),
                               ),
                             );
+                            yardimciFonksiyon();
+
+                            setState(() {
+                              sehir = sehir;
+
+                              temp = null;
+                            });
                           },
                           icon: Icon(
                             Icons.search,
