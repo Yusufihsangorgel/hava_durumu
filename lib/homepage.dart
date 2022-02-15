@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     print('location data : $locationData');
-    var locationDataParsed = jsonDecode(locationData.body);
+    var locationDataParsed = jsonDecode(utf8.decode(locationData.bodyBytes));
     woeid = locationDataParsed[0]['woeid'];
     print('woeid çağrıldı $woeid');
 
