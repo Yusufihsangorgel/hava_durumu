@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:geolocator/geolocator.dart';
 import 'package:hava_durumu/searchpage.dart';
 import 'package:hava_durumu/widgets/spinKit.dart';
 // ignore: import_of_legacy_library_into_null_safe
@@ -17,20 +17,52 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int? temp;
-
   String sehir = 'London';
   var locationData;
   var woeid;
   var weather_state_name;
   var arkaPlan = 'c';
+  late Position position;
+  String userCountry = '';
+
+  Future<Position?> determinePosition() async {
+    LocationPermission permission;
+    await Geolocator.checkPermission();
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location Not Available');
+      }
+    } else {
+      throw Exception('Error');
+    }
+    return await Geolocator.getCurrentPosition();
+  }
+
+  Future<void> getPosition() async {
+    print('position çağırıldı');
+    position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.low);
+    print('$position  = position döndürüldü');
+  }
 
   Future<void> getLocationData() async {
-    locationData = await http
-        .get("https://www.metaweather.com/api/location/search/?query=$sehir");
+    if (userCountry == '') {
+      locationData = await http.get(
+          "https://www.metaweather.com/api/location/search/?lattlong=${position.latitude},${position.longitude}");
+    } else {
+      locationData = await http.get(
+          "https://www.metaweather.com/api/location/search/?query=$userCountry");
+    }
+
+    print('location data : $locationData');
     var locationDataParsed = jsonDecode(locationData.body);
     woeid = locationDataParsed[0]['woeid'];
-    print('woeid = $woeid');
+    print('woeid çağrıldı $woeid');
+
     sehir = locationDataParsed[0]['title'];
+    print('şehir çağrıldı $sehir');
     weather_state_name = locationDataParsed[0]['weather_state_name'];
   }
 
@@ -49,8 +81,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void yardimciFonksiyon() async {
+    await getPosition();
     await getLocationData();
-    getLocationTemperature();
+    await getLocationTemperature();
   }
 
   void initState() {
@@ -120,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         IconButton(
                           onPressed: () async {
-                            sehir = await Navigator.push(
+                            userCountry = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SearchPage(),

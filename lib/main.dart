@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hava_durumu/firstPage.dart';
 import 'package:hava_durumu/homepage.dart';
 
 void main() {
@@ -14,7 +15,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hava Durumu',
       theme: ThemeData.dark(),
-      home: HomePage(),
+      home: FirstPage(),
+      routes: {"/HomePage": (context) => HomePage()},
     );
   }
 }
