@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hava_durumu/searchpage.dart';
+import 'package:hava_durumu/widgets/card.dart';
+import 'package:hava_durumu/widgets/sizedbox.dart';
 import 'package:hava_durumu/widgets/spinKit.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:http/http.dart' as http;
@@ -41,9 +43,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> getPosition() async {
-    print('position çağırıldı');
-    position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.low);
+    try {
+      position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.low);
+    } catch (e) {
+      print('hata : $e');
+    }
     print('$position  = position döndürüldü');
   }
 
@@ -80,6 +85,10 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void konum() async {
+    await determinePosition();
+  }
+
   void yardimciFonksiyon() async {
     await getPosition();
     await getLocationData();
@@ -87,6 +96,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void initState() {
+    konum();
     yardimciFonksiyon();
     super.initState();
   }
@@ -108,6 +118,12 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Container(
+                      height: 60,
+                      width: 60,
+                      child: Image.network(
+                          'https://www.metaweather.com/static/img/weather/png/$arkaPlan.png'),
+                    ),
                     Text(
                       temp.toString() + "° C",
                       style: TextStyle(
@@ -160,10 +176,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                             yardimciFonksiyon();
-
                             setState(() {
                               sehir = sehir;
-
                               temp = null;
                             });
                           },
@@ -173,6 +187,22 @@ class _HomePageState extends State<HomePage> {
                           ),
                         )
                       ],
+                    ),
+                    Row(),
+                    MySize(size: 30),
+                    Container(
+                      height: 200,
+                      width: MediaQuery.of(context).size.width * 0.95,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 5,
+                        itemBuilder: (_, int index) {
+                          return MyCard(
+                              transportImage: arkaPlan,
+                              degree: temp.toString(),
+                              date: '31');
+                        },
+                      ),
                     )
                   ],
                 ),
