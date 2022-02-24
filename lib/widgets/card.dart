@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hava_durumu/widgets/sizedbox.dart';
 
 class MyCard extends StatelessWidget {
   late String transportImage;
@@ -13,6 +14,16 @@ class MyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> weekDays = [
+      'Pazartesi',
+      'Salı',
+      'Çarşamba',
+      'Perşembe',
+      'Cuma',
+      'Cumartesi',
+      'Pazar'
+    ];
+    var weekDay = weekDays[DateTime.parse(date).weekday - 1];
     return Card(
       elevation: 2,
       color: Colors.transparent,
@@ -27,8 +38,10 @@ class MyCard extends StatelessWidget {
               height: 50,
               width: 50,
             ),
+            MySize(size: 20),
             Text('$degree ° C'),
-            Text('$date')
+            MySize(size: 20),
+            Text('$weekDay')
           ],
         ),
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hava_durumu/firstPage.dart';
-import 'package:hava_durumu/homepage.dart';
+import 'package:hava_durumu/pages/firstPage.dart';
+import 'package:hava_durumu/pages/homepage.dart';
 
 void main() {
   runApp(const MyApp());

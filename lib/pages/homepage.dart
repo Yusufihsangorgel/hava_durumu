@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hava_durumu/searchpage.dart';
+import 'package:hava_durumu/pages/searchpage.dart';
 import 'package:hava_durumu/widgets/card.dart';
 import 'package:hava_durumu/widgets/sizedbox.dart';
 import 'package:hava_durumu/widgets/spinKit.dart';
+import 'package:intl/intl.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/date_symbol_data_local.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -18,14 +20,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int? temp;
   String sehir = 'London';
   var locationData;
   var woeid;
   var weather_state_name;
-  var arkaPlan = 'c';
+
   late Position position;
   String userCountry = '';
+  List arkaPlan = ['c', 'c', 'c', 'c', 'c'];
+  List temps = ['', '', '', '', ''];
+  List date = [
+    '2022-02-23',
+    '2022-02-24',
+    '2022-02-25',
+    '2022-02-26',
+    '2022-02-27'
+  ];
 
   Future<Position?> determinePosition() async {
     LocationPermission permission;
@@ -33,6 +43,7 @@ class _HomePageState extends State<HomePage> {
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+      print('burda takıldı yusuf');
       if (permission == LocationPermission.deniedForever) {
         return Future.error('Location Not Available');
       }
@@ -45,11 +56,10 @@ class _HomePageState extends State<HomePage> {
   Future<void> getPosition() async {
     try {
       position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.low);
+          desiredAccuracy: LocationAccuracy.bestForNavigation);
     } catch (e) {
       print('hata : $e');
     }
-    print('$position  = position döndürüldü');
   }
 
   Future<void> getLocationData() async {
@@ -76,12 +86,17 @@ class _HomePageState extends State<HomePage> {
         await http.get('https://www.metaweather.com/api/location/$woeid/');
     var temperatureDataParsed = jsonDecode(response.body);
     setState(() {
-      temp =
-          temperatureDataParsed['consolidated_weather'][0]['the_temp'].round();
-      print('Sıcaklık = $temp');
-      arkaPlan = temperatureDataParsed['consolidated_weather'][0]
-          ["weather_state_abbr"];
-      print('hava kısaltması : ' + arkaPlan);
+      for (var i = 0; i < temps.length; i++) {
+        temps[i] = temperatureDataParsed['consolidated_weather'][i]['the_temp']
+            .round();
+        date[i] =
+            temperatureDataParsed['consolidated_weather'][i]['applicable_date'];
+        arkaPlan[i] = temperatureDataParsed['consolidated_weather'][i]
+            ["weather_state_abbr"];
+      }
+      print('tarih : $date');
+      print('Sıcaklık = ${temps[0]}');
+      print('hava kısaltması : ' + arkaPlan[0]);
     });
   }
 
@@ -107,10 +122,10 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         image: DecorationImage(
           fit: BoxFit.cover,
-          image: AssetImage("images/$arkaPlan.jpg"),
+          image: AssetImage("images/${arkaPlan[0]}.jpg"),
         ),
       ),
-      child: temp == null
+      child: temps[0] == null
           ? Center(child: (mySpinKit.spinkit))
           : Scaffold(
               backgroundColor: Colors.transparent,
@@ -122,10 +137,10 @@ class _HomePageState extends State<HomePage> {
                       height: 60,
                       width: 60,
                       child: Image.network(
-                          'https://www.metaweather.com/static/img/weather/png/$arkaPlan.png'),
+                          'https://www.metaweather.com/static/img/weather/png/${arkaPlan[0]}.png'),
                     ),
                     Text(
-                      temp.toString() + "° C",
+                      temps[0].toString() + "° C",
                       style: TextStyle(
                           fontSize: 70,
                           fontWeight: FontWeight.w600,
@@ -178,7 +193,7 @@ class _HomePageState extends State<HomePage> {
                             yardimciFonksiyon();
                             setState(() {
                               sehir = sehir;
-                              temp = null;
+                              temps[0] = null;
                             });
                           },
                           icon: Icon(
@@ -196,11 +211,11 @@ class _HomePageState extends State<HomePage> {
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: 5,
-                        itemBuilder: (_, int index) {
+                        itemBuilder: (_, dynamic index) {
                           return MyCard(
-                              transportImage: arkaPlan,
-                              degree: temp.toString(),
-                              date: '31');
+                              transportImage: arkaPlan[index],
+                              degree: temps[index].toString(),
+                              date: date[index].toString());
                         },
                       ),
                     )

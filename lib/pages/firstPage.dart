@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hava_durumu/homepage.dart';
-import 'package:hava_durumu/searchpage.dart';
+import 'package:hava_durumu/pages/homepage.dart';
+import 'package:hava_durumu/pages/searchpage.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({Key? key}) : super(key: key);

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hava_durumu/homepage.dart';
+import 'package:hava_durumu/pages/homepage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io' show Platform;
 
